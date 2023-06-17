@@ -1,28 +1,26 @@
-const Contact = require("./schemas/contact");
+const express = require("express");
+require("dotenv").config({ path: "./.env" });
+const logger = require("morgan");
+const cors = require("cors");
 
-const listContacts = async () => {
-  return Contact.find();
-};
+const contactsRouter = require("./routes/api/contacts");
 
-const getContactById = (id) => {
-  return Contact.findOne({ _id: id });
-};
-const addContact = ({ name, email, phone }) => {
-  return Contact.create({ name, email, phone });
-};
+const app = express();
 
-const updateContact = (id, favorite) => {
-  return Contact.findByIdAndUpdate({ _id: id }, favorite);
-};
+const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
-const removeContact = (id) => {
-  return Contact.findByIdAndRemove({ _id: id });
-};
+app.use(logger(formatsLogger));
+app.use(cors());
+app.use(express.json());
 
-module.exports = {
-  listContacts,
-  getContactById,
-  addContact,
-  updateContact,
-  removeContact,
-};
+app.use("/api/contacts", contactsRouter);
+
+app.use((req, res) => {
+  res.status(404).json({ message: "Not found" });
+});
+
+app.use((err, req, res, next) => {
+  res.status(500).json({ message: err.message });
+});
+
+module.exports = app;
