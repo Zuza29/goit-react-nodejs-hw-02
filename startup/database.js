@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const dbpath = process.env.MONGO_SECRET;
+const dbpath = process.env.DB_SECRET;
 
 if (!dbpath) {
   console.error("No db secret...");
@@ -9,7 +9,7 @@ if (!dbpath) {
 const connectDatabase = async () => {
   await mongoose
     .connect(dbpath)
-    .then(() => console.log("Database connection successfull"))
+    .then(() => console.log("Database connection successful"))
     .catch(() => process.exit(1));
 };
 

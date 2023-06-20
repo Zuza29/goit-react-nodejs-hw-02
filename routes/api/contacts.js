@@ -11,13 +11,10 @@ const {
 
 const { contactSchema } = require("../../models/contact");
 
-
 const auth = require("../../auth/auth");
 
 const router = express.Router();
-router.get('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+
 router.get("/", auth, async (req, res, next) => {
   try {
     const contacts = await listContacts();
