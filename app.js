@@ -1,3 +1,6 @@
+const { connectDatabase } = require("./startup/database.js");
+connectDatabase();
+
 const express = require("express");
 require("dotenv").config({ path: "./.env" });
 const logger = require("morgan");
