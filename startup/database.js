@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const dbpath = process.env.DB_SECRET;
+const dbpath = process.env.DB_HOST;
 
 if (!dbpath) {
   console.error("No db secret...");

@@ -1,73 +1,50 @@
+const Joi = require("joi");
 
-const gravatar = require("gravatar");
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
-const { User } = require("../models/user");
-const { hashPassword } = require("../models/user.js");
+const Schema = mongoose.Schema;
 
-const createUser = async (email, password) => {
-  const hashedPassword = hashPassword(password);
-  const avatarURL = gravatar.url(email, { s: "250", d: "404" });
+const users = new Schema({
+  password: {
+    type: String,
+    required: [true, "Password is required"],
+  },
+  email: {
+    type: String,
+    required: [true, "Email is required"],
+    unique: true,
+  },
+  subscription: {
+    type: String,
+    enum: ["starter", "pro", "business"],
+    default: "starter",
+  },
+  avatarURL: {
+    type: String,
+  },
 
-  try {
-    const user = new User({
-      email,
-      password: hashedPassword,
-      avatarURL,
-    });
-    user.save();
-    return user;
-  } catch (err) {
-    console.log(err);
-    throw err;
-  }
+  token: {
+    type: String,
+    default: null,
+  },
+  owner: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: "user",
+  },
+});
+
+const hashPassword = (pass) => {
+  const salt = bcrypt.genSaltSync(10);
+  const hashedPassword = bcrypt.hashSync(pass, salt);
+  return hashedPassword;
 };
 
-const getUserByToken = async (token) => {
-  const user = await User.findOne({ token });
-  return user;
-};
+const User = mongoose.model("user", users);
 
-const logout = async (token) => {
-  try {
-    const user = await User.findByIdAndUpdate(
-      { _id: token._id },
-      { $set: { tokens: [] } },
-      { new: true }
-    );
-    return user;
-  } catch (err) {
-    throw new Error(err.message);
-  }
-};
+const userValidationSchema = Joi.object({
+  password: Joi.string().required(),
+  email: Joi.string().required().email(),
+});
 
-const currentUser = async (req, res) => {
-  try {
-    const { token } = req.user;
-    const user = await User.getUserByToken({ token });
-
-    if (!user) {
-      res.status(401).send("Not authorized");
-    }
-    res.json({ token });
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-
-const updateAvatar = async (email, avatarURL) => {
-  const user = await User.findByIdAndUpdate(
-    { email },
-    { avatarURL },
-    { new: true }
-  );
-  return user;
-};
-
-module.exports = {
-  createUser,
-  getUserByToken,
-  logout,
-  currentUser,
-  updateAvatar,
-};
+module.exports = { User, userValidationSchema, hashPassword };
