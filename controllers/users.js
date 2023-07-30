@@ -22,6 +22,11 @@ const getUserByToken = async (token) => {
   return user;
 };
 
+const getUserByEmail = async (email) => {
+  const user = await User.findOne({ email });
+  return user;
+};
+
 const logout = async (token) => {
   try {
     const user = await User.findByIdAndUpdate(
@@ -49,4 +54,4 @@ const currentUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, getUserByToken, logout, currentUser };
+module.exports = { createUser, getUserByToken, logout, currentUser, getUserByEmail };
