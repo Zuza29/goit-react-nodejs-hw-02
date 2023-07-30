@@ -1,15 +1,16 @@
 const dotenv = require("dotenv");
+
 dotenv.config();
 
 const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
+const path = require("path");
 
 const { connectDatabase } = require("./startup/database.js");
 connectDatabase();
 
 const router = require("./routes/api/routes.js");
-
 
 const app = express();
 
@@ -21,6 +22,8 @@ app.use(express.json());
 
 app.use("/api", router);
 
+app.use("/avatars", express.static(path.join(__dirname, "./public/avatars")));
+app.use("public", express.static("public"));
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });

@@ -1,9 +1,28 @@
+const fs = require("fs");
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const Jimp = require("jimp");
+const path = require("path");
+
+const jwtSecret = process.env.JWT_SECRET;
+
 const loginHandler = require("../../auth/loginHandler");
 const auth = require("../../auth/auth");
 const userControllers = require("../../controllers/users.js");
-const jwt = require("jsonwebtoken");
-const jwtSecret = process.env.JWT_SECRET;
+
+const storeAvatar = path.join(process.cwd(), "tmp");
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, storeAvatar);
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalName);
+  },
+  limits: 1048576,
+});
+
+const upload = multer({ storage });
 
 require("dotenv").config();
 
@@ -82,5 +101,38 @@ router.get("/current", auth, async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+router.patch(
+  "/avatars",
+  auth,
+  upload.single("avatar", async (req, res, next) => {
+    try {
+      const { email } = req.user;
+      const { path: temporaryName, originalName } = req.file;
+      const fileName = path.join(storeAvatar, originalName);
+      await fs.rename(temporaryName, fileName);
+
+      const img = await Jimp.read(fileName);
+      await img.autocrop().cover(250, 250).quality(72).writeAsync(fileName);
+
+      await fs.rename(
+        fileName,
+        path.join(process.cwd(), "public/avatars", originalName)
+      );
+
+      const avatarURL = path.join(
+        process.cwd(),
+        "public/avatars",
+        originalName
+      );
+      const cleanAvatarURL = avatarURL.replace(/\s/g, "/");
+      const user = await userControllers.updateAvatar(email, cleanAvatarURL);
+      res.status(200).json(user);
+    } catch (err) {
+      next(err);
+      return res.status(500).send("Server error");
+    }
+  })
+);
 
 module.exports = router;

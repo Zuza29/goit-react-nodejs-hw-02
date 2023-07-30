@@ -1,31 +1,64 @@
-const Joi = require("joi");
-const mongoose = require("mongoose");
+const { Contact } = require("../models/contact");
 
-const Schema = mongoose.Schema;
+const { hashPassword } = require("../models/user.js");
 
-const contacts = new Schema({
-  name: {
-    type: String,
-    required: [true, "Set name for contact"],
-  },
-  email: {
-    type: String,
-  },
-  phone: {
-    type: String,
-  },
-  favorite: {
-    type: Boolean,
-    default: false,
-  },
-});
+const listContacts = async () => {
+  const contacts = await Contact.find();
+  return contacts;
+};
 
-const Contact = mongoose.model("contact", contacts);
+const getContactById = async (_id) => {
+  const contacts = await Contact.find({ _id });
+  return contacts;
+};
 
-const contactSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().email().required(),
-  phone: Joi.string().required(),
-});
+const removeContact = async (_id) => {
+  try {
+    return Contact.findByIdAndDelete({ _id });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-module.exports = { contactSchema, Contact };
+const addContact = async (name, email, phone, password) => {
+  const hashedPassword = hashPassword(password);
+
+  try {
+    const contact = new Contact({
+      name,
+      email,
+      phone,
+      password: hashedPassword,
+    });
+    contact.save();
+    return contact;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+
+const updateContact = async (id, newContact) => {
+  const updatedContact = await Contact.findByIdAndUpdate({ id, newContact });
+  return updatedContact;
+};
+
+const updateStatusContact = async (id, favorite) => {
+  const updatedContact = await Contact.findByIdAndUpdate(
+    id,
+    { favorite },
+    {
+      new: true,
+    }
+  );
+  return updatedContact;
+};
+
+module.exports = {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+  updateContact,
+  updateStatusContact,
+};
