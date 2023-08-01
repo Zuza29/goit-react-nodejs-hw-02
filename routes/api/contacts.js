@@ -11,7 +11,8 @@ const {
 
 const { contactSchema } = require("../../models/contact");
 
-const auth = require("../../auth/auth");
+const { auth } = require("../../auth/passportStrategy.js")
+
 
 const router = express.Router();
 
