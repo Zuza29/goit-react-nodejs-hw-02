@@ -1,14 +1,14 @@
 const fs = require("fs");
 const express = require("express");
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const Jimp = require("jimp");
 const path = require("path");
 
-const jwtSecret = process.env.JWT_SECRET;
+// const jwtSecret = process.env.JWT_SECRET;
 
 const loginHandler = require("../../auth/loginHandler");
-const auth = require("../../auth/auth");
+const { auth } = require("../../auth/passportStrategy.js")
 const userControllers = require("../../controllers/users.js");
 
 const storeAvatar = path.join(process.cwd(), "tmp");
@@ -79,27 +79,15 @@ router.post("/login", async (req, res, next) => {
 
 router.get("/logout", auth, async (req, res) => {
   try {
-    const { token } = req.headers.authorization;
-    const verify = jwt.verify(token, jwtSecret);
-    const user = await userControllers.logout(verify);
-    res.status(204).send("Logout success", user);
+    await userControllers.logout(req.user._id);
+    res.status(204).send("Logout success");
   } catch (error) {
     res.status(500).send("Server error");
   }
 });
 
 router.get("/current", auth, async (req, res) => {
-  try {
-    const { token } = req.user;
-    const user = await userControllers.getUserByToken(token);
-
-    if (!user) {
-      return res.status(401).json({ message: "Not authorized" });
-    }
-    return res.status(200).json(user);
-  } catch (error) {
-    res.status(500).send(error);
-  }
+  return res.status(200).json(req.user);
 });
 
 router.patch(

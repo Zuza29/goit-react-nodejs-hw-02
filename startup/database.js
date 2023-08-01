@@ -10,7 +10,11 @@ const connectDatabase = async () => {
   await mongoose
     .connect(dbpath)
     .then(() => console.log("Database connection successful"))
-    .catch(() => process.exit(1));
+    .catch((error) => {
+      console.log(error)
+      process.exit(1)
+    });
 };
+
 
 module.exports = { connectDatabase };

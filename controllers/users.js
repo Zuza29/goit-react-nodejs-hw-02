@@ -31,13 +31,14 @@ const getUserByEmail = async (email) => {
   return user;
 };
 
-const logout = async (token) => {
+const logout = async (id) => {
   try {
     const user = await User.findByIdAndUpdate(
-      { _id: token._id },
-      { $set: { tokens: [] } },
+      { _id: id },
+      { $set: { token: '' } },
       { new: true }
     );
+    user.save();
     return user;
   } catch (err) {
     throw new Error(err.message);
