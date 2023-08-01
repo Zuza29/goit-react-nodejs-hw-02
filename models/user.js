@@ -1,7 +1,6 @@
 const Joi = require("joi");
 
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 
 const Schema = mongoose.Schema;
 
@@ -34,11 +33,7 @@ const users = new Schema({
   },
 });
 
-const hashPassword = (pass) => {
-  const salt = bcrypt.genSaltSync(10);
-  const hashedPassword = bcrypt.hashSync(pass, salt);
-  return hashedPassword;
-};
+
 
 const User = mongoose.model("user", users);
 
@@ -47,4 +42,4 @@ const userValidationSchema = Joi.object({
   email: Joi.string().required().email(),
 });
 
-module.exports = { User, userValidationSchema, hashPassword };
+module.exports = { User, userValidationSchema };
