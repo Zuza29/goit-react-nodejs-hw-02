@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require('fs').promises;
 const express = require("express");
 // const jwt = require("jsonwebtoken");
 const multer = require("multer");
@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
     cb(null, storeAvatar);
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalName);
+    cb(null, file.originalname);
   },
   limits: 1048576,
 });
@@ -93,34 +93,38 @@ router.get("/current", auth, async (req, res) => {
 router.patch(
   "/avatars",
   auth,
-  upload.single("avatar", async (req, res, next) => {
+  upload.single("avatar"),
+  async (req, res, next) => {
     try {
-      const { email } = req.user;
-      const { path: temporaryName, originalName } = req.file;
-      const fileName = path.join(storeAvatar, originalName);
-      await fs.rename(temporaryName, fileName);
+      const { _id } = req.user;
+      const { path: temporaryName, originalname } = req.file;
+      const fileName = path.join(storeAvatar, originalname);
+
+      fs.rename(temporaryName, fileName);
 
       const img = await Jimp.read(fileName);
       await img.autocrop().cover(250, 250).quality(72).writeAsync(fileName);
 
-      await fs.rename(
+      fs.rename(
         fileName,
-        path.join(process.cwd(), "public/avatars", originalName)
+        path.join(process.cwd(), "public/avatars", originalname)
       );
 
       const avatarURL = path.join(
         process.cwd(),
         "public/avatars",
-        originalName
+        originalname
       );
+
       const cleanAvatarURL = avatarURL.replace(/\s/g, "/");
-      const user = await userControllers.updateAvatar(email, cleanAvatarURL);
+      const user = await userControllers.updateAvatar(_id, cleanAvatarURL);
+
       res.status(200).json(user);
     } catch (err) {
       next(err);
       return res.status(500).send("Server error");
     }
-  })
+  }
 );
 
 module.exports = router;

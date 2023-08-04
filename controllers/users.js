@@ -60,13 +60,12 @@ const currentUser = async (req, res) => {
 };
 
 
-const updateAvatar = async (email, avatarURL) => {
-  const user = await User.findByIdAndUpdate(
-    { email },
+const updateAvatar = async (id, avatarURL) => {
+  return User.findByIdAndUpdate(
+    { _id: id },
     { avatarURL },
     { new: true }
   );
-  return user;
 };
 
 module.exports = {
