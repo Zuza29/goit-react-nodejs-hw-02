@@ -10,6 +10,9 @@ const path = require("path");
 const { connectDatabase } = require("./startup/database.js");
 connectDatabase();
 
+const folders = require("./startup/folders.js");
+folders.init();
+
 const router = require("./routes/api/routes.js");
 
 const app = express();

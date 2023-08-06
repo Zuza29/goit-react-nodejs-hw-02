@@ -1,7 +1,6 @@
 const fs = require("fs/promises");
 
-
-const isExist = (path) => {
+const isExist = async (path) => {
     return fs
         .access(path)
         .then(() => true)
@@ -14,4 +13,10 @@ const createFolder = async (path) => {
     }
 };
 
-module.exports = createFolder;
+const init = async () => {
+    await createFolder("tmp");
+    await createFolder("public");
+    await createFolder("public/avatars");
+}
+
+module.exports = { init };
