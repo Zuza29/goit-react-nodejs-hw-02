@@ -1,10 +1,10 @@
 const gravatar = require("gravatar");
 
 const { User } = require("../models/user");
-const { hashPassword } = require("../models/user.js");
 
 const createUser = async (email, password) => {
-  const hashedPassword = hashPassword(password);
+  const bcrypt = require("bcrypt");
+  const hashedPassword = await bcrypt.hash(password, 1);
   const avatarURL = gravatar.url(email, { s: "250", d: "404" });
 
   try {
