@@ -101,14 +101,13 @@ const updateAvatar = async (id, avatarURL) => {
   );
 };
 
-const verifyUser = async (verifyToken) => {
-  const user = await User.findByIdAndUpdate(
-    { verifyToken },
-    { verify: true, verifyToken: null },
-    { new: true }
+const verifyUser = async (verificationToken) => {
+  return User.findOneAndUpdate(
+    { verificationToken },
+    { verify: true, verificationToken: null },
   );
-  return user;
 };
+
 const templateHtml = () => {
   const imgUrl =
     "https://hips.hearstapps.com/hmg-prod/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=1xw:0.74975xh;center,top&resize=1200:*";

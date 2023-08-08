@@ -31,6 +31,14 @@ const users = new Schema({
     type: mongoose.SchemaTypes.ObjectId,
     ref: "user",
   },
+  verify: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
+    required: [true, "Verification token is required"],
+  }
 });
 
 
