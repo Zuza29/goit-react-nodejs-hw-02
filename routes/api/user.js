@@ -176,11 +176,11 @@ router.post("/verify", async (req, res) => {
 
     const sendEmail = async () => {
       const info = await transporter.sendMail({
-        from: { name: "Ewelina", address: "foo@example.com" },
+        from: { name: "Zuza", address: "foobar@example.com" },
         to: user.email,
         subject: `Verification ${new Date().toISOString()}`,
         text: "Hello",
-        html: userControllers.templateHtml(),
+        html: userControllers.templateHtml(user.verificationToken),
       });
       const previewUrl = nodemailer.getTestMessageUrl(info);
       console.log(previewUrl);

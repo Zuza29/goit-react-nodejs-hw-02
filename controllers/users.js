@@ -111,11 +111,11 @@ const verifyUser = async (verificationToken) => {
   );
 };
 
-const templateHtml = () => {
+const templateHtml = token => {
   const imgUrl =
     "https://hips.hearstapps.com/hmg-prod/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=1xw:0.74975xh;center,top&resize=1200:*";
   return `
-   <h1 style="color:blue"><a href="http://localhost:3000/api/users/verify/${user.verificationToken}"></a></h1>
+    <h1 style="color:blue"><a href="http://localhost:3000/api/users/verify/${token}"></a></h1>
    <div>
    <a href=${imgUrl}></a>
    </div>
